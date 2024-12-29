@@ -1,12 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import Login from '../components/login.svelte'
 ---
 
 <Layout>
-  <header>
-    <h1>Likes Manager</h1>
+  <header class="text-center py-10">
+    <h1 class="text-3xl">Likes Manager</h1>
   </header>
-  <main>
-    <section></section>
+  <main class="flex text-center justify-center">
+    <section>
+      <Login client:only="svelte" />
+    </section>
   </main>
 </Layout>
