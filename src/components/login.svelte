@@ -1,34 +1,36 @@
 <script lang="ts">
-  import { parse } from 'cookie'
+  import type { SpotifyProfile } from 'jvb-spotify-client'
   import { Cookies } from '../constants'
-  import { onMount } from 'svelte'
+  import { getCookie } from '../lib/cookies'
 
   let {
     startUrl,
+    userProfile,
   }: {
     startUrl: string
+    userProfile: SpotifyProfile | null
   } = $props()
 
-  /**
-   * TODO: login url from spotty-client
-   */
-  let loaded = $state(false)
-  let isLoggedIn = $state(false)
+  const token = getCookie(Cookies.Token.name)
+  const isLoggedIn = !!token && !!userProfile
 
-  onMount(() => {
-    const tokenFromCookie = parse(document.cookie)[Cookies.SpotifyToken.name]
-    isLoggedIn = !!tokenFromCookie
-    loaded = true
-  })
+  const profilePic = userProfile?.images[0]?.url
 </script>
 
-<!-- avoid flashing UI -->
-{#if loaded}
+<div class="flex justify-center">
   {#if !isLoggedIn}
     <a href={startUrl}>
       <button class="bg-pink-300 px-4 py-2 rounded">log me in</button>
     </a>
   {:else}
-    <p>logged in bruv</p>
+    <div class="flex flex-col">
+      {#if profilePic}
+        <img
+          src={profilePic}
+          class="mx-auto rounded-full h-20 w-20 object-cover"
+        />
+      {/if}
+      <p>Logged in as: {userProfile.display_name}</p>
+    </div>
   {/if}
-{/if}
+</div>

@@ -1,23 +1,61 @@
 ---
-import { getStartUrl } from 'jvb-spotify-client'
+import {
+  getMyLikedTracks,
+  getMyProfile,
+  getStartUrl,
+  type SpotifyPlaylistTrack,
+  type SpotifyProfile,
+} from 'jvb-spotify-client'
 import Layout from '../layouts/Layout.astro'
 import Login from '../components/login.svelte'
-import { RequiredScopes } from '../constants'
+import UserLikes from '../components/user-likes.svelte'
+import { Cookies, RequiredScopes } from '../constants'
 
 const startUrl = getStartUrl({
   clientId: import.meta.env.SPOTIFY_CLIENT_ID!,
   redirectUri: import.meta.env.SPOTIFY_REDIRECT_URI!,
   scopes: RequiredScopes,
 })
+
+const token = Astro.cookies.get(Cookies.Token.name)
+console.log({
+  token,
+  e: Astro.cookies,
+})
+
+const userLikes: SpotifyPlaylistTrack[] = []
+let userProfile: SpotifyProfile | null = null
+if (token?.value) {
+  const [likes, profile] = await Promise.all([
+    getMyLikedTracks(token.value),
+    getMyProfile(token.value),
+  ])
+  userLikes.push(...likes)
+  userProfile = profile
+}
+
+console.log({
+  userLikes: userLikes.length,
+  userProfile: !!userProfile,
+})
 ---
 
 <Layout>
-  <header class="text-center py-10">
-    <h1 class="text-3xl">Likes Manager</h1>
+  <header class="py-4">
+    <h1 class="text-center text-3xl">Likes Manager</h1>
   </header>
   <main class="flex text-center justify-center">
     <section>
-      <Login startUrl={startUrl} client:only="svelte" />
+      <Login
+        startUrl={startUrl}
+        userProfile={userProfile}
+        client:only="svelte"
+      />
+      {
+        userLikes.length > 0 && (
+          <UserLikes userLikes={userLikes} client:only="svelte" />
+        )
+      }
     </section>
   </main>
 </Layout>
