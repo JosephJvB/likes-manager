@@ -1,6 +1,14 @@
 ---
+import { getStartUrl } from 'jvb-spotify-client'
 import Layout from '../layouts/Layout.astro'
 import Login from '../components/login.svelte'
+import { RequiredScopes } from '../constants'
+
+const startUrl = getStartUrl({
+  clientId: import.meta.env.SPOTIFY_CLIENT_ID!,
+  redirectUri: import.meta.env.SPOTIFY_REDIRECT_URI!,
+  scopes: RequiredScopes,
+})
 ---
 
 <Layout>
@@ -9,7 +17,7 @@ import Login from '../components/login.svelte'
   </header>
   <main class="flex text-center justify-center">
     <section>
-      <Login client:only="svelte" />
+      <Login startUrl={startUrl} client:only="svelte" />
     </section>
   </main>
 </Layout>

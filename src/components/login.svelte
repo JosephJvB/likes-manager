@@ -3,14 +3,17 @@
   import { Cookies } from '../constants'
   import { onMount } from 'svelte'
 
+  let {
+    startUrl,
+  }: {
+    startUrl: string
+  } = $props()
+
   /**
    * TODO: login url from spotty-client
    */
-  const loginUrl = new URL(window.location.href)
-  loginUrl.searchParams.append(Cookies.SpotifyToken.name, '123')
-
-  let loaded = false
-  let isLoggedIn = false
+  let loaded = $state(false)
+  let isLoggedIn = $state(false)
 
   onMount(() => {
     const tokenFromCookie = parse(document.cookie)[Cookies.SpotifyToken.name]
@@ -22,7 +25,7 @@
 <!-- avoid flashing UI -->
 {#if loaded}
   {#if !isLoggedIn}
-    <a href={loginUrl.toString()}>
+    <a href={startUrl}>
       <button class="bg-pink-300 px-4 py-2 rounded">log me in</button>
     </a>
   {:else}
